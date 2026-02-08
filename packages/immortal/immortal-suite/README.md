@@ -17,6 +17,36 @@ php artisan migrate
 
 6. Configure settings in the Immortal Suite Settings page (Discord secrets, feature flags, risk weights).
 
+## Docker (Windows 10 PowerShell) Install
+
+1. Edit your SeAT Docker `.env` (usually in `/opt/seat-docker`) and set:
+
+```
+SEAT_PLUGINS=immortal/immortal-suite
+```
+
+2. Rebuild containers:
+
+```
+docker-compose up -d
+```
+
+3. Run maintenance + migrations inside the container:
+
+```
+docker exec -it <seat_container_name> php artisan down
+docker exec -it <seat_container_name> composer require immortal/immortal-suite
+docker exec -it <seat_container_name> php artisan vendor:publish --force --all
+docker exec -it <seat_container_name> php artisan migrate
+docker exec -it <seat_container_name> php artisan route:cache
+docker exec -it <seat_container_name> php artisan config:cache
+docker exec -it <seat_container_name> php artisan seat:cache:clear
+docker exec -it <seat_container_name> php artisan db:seed --class=Seat\\\\Services\\\\Database\\\\Seeders\\\\PluginDatabaseSeeder
+docker exec -it <seat_container_name> php artisan up
+```
+
+> Note: The plugin settings are stored in the database (no extra .env keys required).
+
 ## Dummies Guide (Quick Start)
 
 1. **Install & migrate**
