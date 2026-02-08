@@ -1,0 +1,21 @@
+{
+  "name": "immortal/immortal-suite",
+  "description": "Immortal Suite - Ultimate Recruiting & Risk Plugin for SeAT v5",
+  "type": "library",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Immortal\\Suite\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Immortal\\Suite\\Providers\\ImmortalSuiteServiceProvider"
+      ]
+    }
+  },
+  "require": {
+    "php": ">=8.1"
+  }
+}
