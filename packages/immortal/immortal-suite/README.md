@@ -52,24 +52,40 @@ docker exec -it <seat_container_name> php artisan up
 If `SEAT_PLUGINS=immortal/immortal-suite` fails with “Could not find a matching version”, the package is not published to Packagist.
 In that case, use a **local path repository** inside the container:
 
-1. Mount this plugin into the container (example):
+1. Mount this plugin into every SeAT service container (example for `front`, `worker`, and `scheduler`):
 
 ```
-./packages/immortal/immortal-suite:/var/www/seat/packages/immortal/immortal-suite
+services:
+  front:
+    volumes:
+      - "./packages:/var/www/seat/packages"
+      - "./packages/immortal/immortal-suite:/var/www/seat/packages/immortal/immortal-suite"
+  worker:
+    volumes:
+      - "./packages:/var/www/seat/packages"
+      - "./packages/immortal/immortal-suite:/var/www/seat/packages/immortal/immortal-suite"
+  scheduler:
+    volumes:
+      - "./packages:/var/www/seat/packages"
+      - "./packages/immortal/immortal-suite:/var/www/seat/packages/immortal/immortal-suite"
 ```
 
-2. Add a path repository to the SeAT `composer.json` in the container:
+> Note: On Windows, the left side of the volume mount should be an absolute path (for example,
+> `C:/seat-docker/Plugins/SeAT-Recruit-Master/packages/immortal/immortal-suite`).
+
+2. Add a path repository to the SeAT `composer.json` (inside the container or on the host volume):
 
 ```json
-\"repositories\": [
-  {\"type\": \"path\", \"url\": \"packages/immortal/immortal-suite\", \"options\": {\"symlink\": true}}
+"repositories": [
+  { "type": "path", "url": "packages/immortal/immortal-suite", "options": { "symlink": true } }
 ]
 ```
 
-3. Require the package and run migrations (inside container):
+3. Require the package and run migrations (inside the container):
 
 ```
 composer require immortal/immortal-suite
+php artisan vendor:publish --tag=immortal-suite-config
 php artisan migrate
 ```
 
@@ -87,9 +103,9 @@ php artisan migrate
    - Use `/api/v1/immortal/intel/record` with `X-Immortal-Admin-Token` to push intel events.
 4. **Intel auto-derivation**
    - Ensure SeAT contact tables are present (configurable via Settings → Intel Configuration).
-4. **Applicant completes the checklist**
+5. **Applicant completes the checklist**
    - They confirm alts, answer required questions, and click **Done**.
-5. **Recruiters review**
+6. **Recruiters review**
    - Applications appear under **Applications**, and Dossiers show risk findings.
 
 ## Feature Overview
